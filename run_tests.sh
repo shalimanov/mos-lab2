@@ -5,7 +5,7 @@ mkdir -p results
 MESSAGE_SIZES=(128 256 512 1024)
 MESSAGE_COUNTS=(100 1000 10000)
 MMAP_MODE="MAP_SHARED"
-IPC_METHODS=("mmap" "shm" "msgqueue")
+IPC_METHODS=("mmap" "shm" "posix_msgqueue")
 
 RESULT_FILE="results/summary.csv"
 echo "Method,MessageSize,MessageCount,Mode,Latency (sec),Throughput (bytes/sec),Capacity" > $RESULT_FILE

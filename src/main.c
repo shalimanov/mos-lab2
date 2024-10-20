@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <unistd.h>
 #include "ipc_mmap.h"
 #include "ipc_shm.h"
-#include "ipc_msgqueue.h"
+#include "ipc_posix_msgqueue.h"
 #include "utils.h"
 
 int main(int argc, char *argv[]) {
@@ -32,12 +33,12 @@ int main(int argc, char *argv[]) {
         if (ipc_shm_init(message_size) != 0) {
             return EXIT_FAILURE;
         }
-    } else if (strcmp(ipc_method, "msgqueue") == 0) {
-        if (ipc_msgqueue_init() != 0) {
+    } else if (strcmp(ipc_method, "posix_msgqueue") == 0) {
+        if (ipc_posix_msgqueue_init() != 0) {
             return EXIT_FAILURE;
         }
     } else {
-        printf("Невідомий метод IPC: %s. Використовуйте mmap, shm або msgqueue.\n", ipc_method);
+        printf("Невідомий метод IPC: %s. Використовуйте mmap, shm або posix_msgqueue.\n", ipc_method);
         return EXIT_FAILURE;
     }
 
@@ -46,7 +47,7 @@ int main(int argc, char *argv[]) {
         log_error("Не вдалося виділити пам'ять для повідомлення");
         if (strcmp(ipc_method, "mmap") == 0) ipc_mmap_cleanup();
         if (strcmp(ipc_method, "shm") == 0) ipc_shm_cleanup();
-        if (strcmp(ipc_method, "msgqueue") == 0) ipc_msgqueue_cleanup();
+        if (strcmp(ipc_method, "posix_msgqueue") == 0) ipc_posix_msgqueue_cleanup();
         return EXIT_FAILURE;
     }
     memset(message, 'A', message_size);
@@ -60,8 +61,8 @@ int main(int argc, char *argv[]) {
             ipc_mmap_send(message, message_size);
         } else if (strcmp(ipc_method, "shm") == 0) {
             ipc_shm_send(message, message_size);
-        } else if (strcmp(ipc_method, "msgqueue") == 0) {
-            ipc_msgqueue_send(message, message_size);
+        } else if (strcmp(ipc_method, "posix_msgqueue") == 0) {
+            ipc_posix_msgqueue_send(message, message_size);
         }
         double latency = end_timer(&start_time);
         total_latency += latency;
@@ -75,8 +76,8 @@ int main(int argc, char *argv[]) {
             ipc_mmap_send(message, message_size);
         } else if (strcmp(ipc_method, "shm") == 0) {
             ipc_shm_send(message, message_size);
-        } else if (strcmp(ipc_method, "msgqueue") == 0) {
-            ipc_msgqueue_send(message, message_size);
+        } else if (strcmp(ipc_method, "posix_msgqueue") == 0) {
+            ipc_posix_msgqueue_send(message, message_size);
         }
     }
     double total_time = end_timer(&start_time);
@@ -85,7 +86,7 @@ int main(int argc, char *argv[]) {
     stats.latency = average_latency;
     stats.throughput = (message_size * message_count) / total_time;
     stats.channel_capacity = (strcmp(ipc_method, "mmap") == 0) ? ipc_mmap_get_capacity() :
-                             (strcmp(ipc_method, "shm") == 0) ? ipc_shm_get_capacity() : ipc_msgqueue_get_capacity();
+                             (strcmp(ipc_method, "shm") == 0) ? ipc_shm_get_capacity() : ipc_posix_msgqueue_get_capacity();
 
     const char *result_file = "results/summary.csv";
     save_results_to_csv(result_file, &stats, message_size, message_count, ipc_method);
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
     free(message);
     if (strcmp(ipc_method, "mmap") == 0) ipc_mmap_cleanup();
     if (strcmp(ipc_method, "shm") == 0) ipc_shm_cleanup();
-    if (strcmp(ipc_method, "msgqueue") == 0) ipc_msgqueue_cleanup();
+    if (strcmp(ipc_method, "posix_msgqueue") == 0) ipc_posix_msgqueue_cleanup();
 
     return EXIT_SUCCESS;
 }
