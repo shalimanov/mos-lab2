@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <unistd.h> // Для usleep()
 #include "ipc_mmap.h"
 #include "ipc_shm.h"
 #include "ipc_msgqueue.h"
@@ -63,7 +62,6 @@ int main(int argc, char *argv[]) {
             ipc_shm_send(message, message_size);
         } else if (strcmp(ipc_method, "msgqueue") == 0) {
             ipc_msgqueue_send(message, message_size);
-            usleep(100); // Додаємо затримку 100 мікросекунд між відправками
         }
         double latency = end_timer(&start_time);
         total_latency += latency;
@@ -79,7 +77,6 @@ int main(int argc, char *argv[]) {
             ipc_shm_send(message, message_size);
         } else if (strcmp(ipc_method, "msgqueue") == 0) {
             ipc_msgqueue_send(message, message_size);
-            usleep(100); // Затримка 100 мікросекунд
         }
     }
     double total_time = end_timer(&start_time);
