@@ -1,0 +1,208 @@
+Start testing.
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=64, MESSAGE_COUNT=100, MMAP_MODE=shared
+Elapsed time: 0.000027 seconds
+Throughput: 237037037.037037 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=64, MESSAGE_COUNT=100, MMAP_MODE=private
+Elapsed time: 0.000010 seconds
+Throughput: 653061224.489796 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=64, MESSAGE_COUNT=1000, MMAP_MODE=shared
+Elapsed time: 0.000096 seconds
+Throughput: 670157068.062827 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=64, MESSAGE_COUNT=1000, MMAP_MODE=private
+Elapsed time: 0.000150 seconds
+Throughput: 426666666.666667 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=1024, MESSAGE_COUNT=100, MMAP_MODE=shared
+Elapsed time: 0.000169 seconds
+Throughput: 604843473.124631 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=1024, MESSAGE_COUNT=100, MMAP_MODE=private
+Elapsed time: 0.000121 seconds
+Throughput: 845582163.501239 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000, MMAP_MODE=shared
+Elapsed time: 0.001804 seconds
+Throughput: 567658961.139753 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=mmap, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000, MMAP_MODE=private
+Elapsed time: 0.001386 seconds
+Throughput: 738550306.527227 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=64, MESSAGE_COUNT=100
+Elapsed time: 0.000047 seconds
+Throughput: 136752136.752137 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=64, MESSAGE_COUNT=1000
+Elapsed time: 0.000177 seconds
+Throughput: 360766629.086809 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=1024, MESSAGE_COUNT=100
+Elapsed time: 0.000477 seconds
+Throughput: 214630506.456731 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000
+Elapsed time: 0.004588 seconds
+Throughput: 223176437.101513 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=pipe, MESSAGE_SIZE=64, MESSAGE_COUNT=100
+Elapsed time: 0.000362 seconds
+Throughput: 17704011.065007 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=pipe, MESSAGE_SIZE=64, MESSAGE_COUNT=1000
+Elapsed time: 0.004232 seconds
+Throughput: 15122523.155182 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=pipe, MESSAGE_SIZE=1024, MESSAGE_COUNT=100
+Elapsed time: 0.000318 seconds
+Throughput: 322216243.600515 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=pipe, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000
+Elapsed time: 0.005214 seconds
+Throughput: 196390631.706577 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=fifo, MESSAGE_SIZE=64, MESSAGE_COUNT=100
+Elapsed time: 0.000494 seconds
+Throughput: 12952869.769014 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=fifo, MESSAGE_SIZE=64, MESSAGE_COUNT=1000
+Elapsed time: 0.005157 seconds
+Throughput: 12410802.207106 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=fifo, MESSAGE_SIZE=1024, MESSAGE_COUNT=100
+Elapsed time: 0.000222 seconds
+Throughput: 461469130.238846 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=fifo, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000
+Elapsed time: 0.002484 seconds
+Throughput: 412238491.239328 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=file, MESSAGE_SIZE=64, MESSAGE_COUNT=100
+Elapsed time: 0.004465 seconds
+Throughput: 1433242.904664 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=file, MESSAGE_SIZE=64, MESSAGE_COUNT=1000
+Elapsed time: 0.010082 seconds
+Throughput: 6347697.511584 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=file, MESSAGE_SIZE=1024, MESSAGE_COUNT=100
+Elapsed time: 0.003892 seconds
+Throughput: 26313098.115479 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=file, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000
+Elapsed time: 0.009623 seconds
+Throughput: 106413977.808529 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=message_queue, MESSAGE_SIZE=64, MESSAGE_COUNT=100
+Elapsed time: 0.000415 seconds
+Throughput: 15403165.831927 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=message_queue, MESSAGE_SIZE=64, MESSAGE_COUNT=1000
+Elapsed time: 0.002599 seconds
+Throughput: 24625812.699916 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=message_queue, MESSAGE_SIZE=1024, MESSAGE_COUNT=100
+Elapsed time: 0.000371 seconds
+Throughput: 276010781.671159 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=message_queue, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000
+Elapsed time: 0.002693 seconds
+Throughput: 380273462.668398 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=unix_socket, MESSAGE_SIZE=64, MESSAGE_COUNT=100
+Elapsed time: 0.000166 seconds
+Throughput: 38647342.995169 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=unix_socket, MESSAGE_SIZE=64, MESSAGE_COUNT=1000
+Elapsed time: 0.001560 seconds
+Throughput: 41020408.294070 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=unix_socket, MESSAGE_SIZE=1024, MESSAGE_COUNT=100
+Elapsed time: 0.000233 seconds
+Throughput: 439296439.296439 bytes/second
+Test finished.
+---
+Testing IPC_METHOD=unix_socket, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000
+Elapsed time: 0.001988 seconds
+Throughput: 515116713.676097 bytes/second
+Test finished.
+---
+Measuring Channel Capacity for message_queue
+Actual mq_maxmsg: 20
+Actual mq_msgsize: 64
+Відправлено повідомлення 1
+Відправлено повідомлення 2
+Відправлено повідомлення 3
+Відправлено повідомлення 4
+Відправлено повідомлення 5
+Відправлено повідомлення 6
+Відправлено повідомлення 7
+Відправлено повідомлення 8
+Відправлено повідомлення 9
+Відправлено повідомлення 10
+Відправлено повідомлення 11
+Відправлено повідомлення 12
+Відправлено повідомлення 13
+Відправлено повідомлення 14
+Відправлено повідомлення 15
+Відправлено повідомлення 16
+Відправлено повідомлення 17
+Відправлено повідомлення 18
+Відправлено повідомлення 19
+Відправлено повідомлення 20
+Максимальна ємність черги повідомлень до 20 повідомлень
+Measurement finished.
+---
+Measuring Channel Capacity for pipe
+Вимірювання ємності каналу (Pipe)
+Розмір повідомлення: 64 байт
+Ємність каналу: 1 повідомлень
+Ємність каналу: 101 повідомлень
+Ємність каналу: 201 повідомлень
+Ємність каналу: 301 повідомлень
+Ємність каналу: 401 повідомлень
+Максимальна ємність каналу до 401 повідомлень
+Measurement finished.
+---
+Measuring Channel Capacity for unix_socket
+Сервер: Сокет прослуховується.
+Сервер: Клієнт підключився.
+Клієнт: Підключено до сервера.
+Клієнт: Всі повідомлення отримані.
+Максимальна ємність UNIX сокета: 952 повідомлень
+Measurement finished.
+---
+Testing has been finished.
+---
