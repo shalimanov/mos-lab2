@@ -1,21 +1,26 @@
+# Makefile
 CC = gcc
-CFLAGS = -Wall -O2
+CFLAGS = -Iinclude -Wall -Wextra -O2
 LDFLAGS =
 
-SRC_DIR = src
-OBJ_DIR = obj
+SRCDIR = src
+OBJDIR = build
 
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
-OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
+SOURCES = $(wildcard $(SRCDIR)/*.c)
+OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
-all: ipc_test
+TARGET = ipc_compare
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+all: $(TARGET)
 
-ipc_test: $(OBJECTS)
-	$(CC) $(CFLAGS) -o ipc_test $(OBJECTS) $(LDFLAGS)
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJ_DIR)/*.o ipc_test
+	rm -rf $(OBJDIR) $(TARGET)
+
+.PHONY: all clean

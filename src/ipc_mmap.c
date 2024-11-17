@@ -1,70 +1,85 @@
-#include "ipc_mmap.h"
-#include "utils.h"
-#include <sys/mman.h>
+// src/ipc_mmap.c
+#include "ipc.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
+#include <sys/mman.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <time.h>
 
-static int fd = -1;
-static void *map = NULL;
-static size_t map_size = 0;
+void ipc_mmap(const ipc_params_t* params) {
+    const char* shm_name = "/ipc_mmap_shm";
+    size_t total_size = params->message_size * params->message_count;
+    int fd;
+    void* addr;
+    int mmap_flags;
 
-int ipc_mmap_init(int mode, size_t size) {
-    fd = shm_open("ipc_mmap", O_CREAT | O_RDWR, 0666);
-    if (fd == -1) {
-        log_error("Не вдалося відкрити спільну пам'ять");
-        return -1;
+    if (params->mmap_mode == IPC_MMAP_SHARED) {
+        fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+        if (fd == -1) {
+            perror("shm_open");
+            exit(EXIT_FAILURE);
+        }
+
+        if (ftruncate(fd, total_size) == -1) {
+            perror("ftruncate");
+            shm_unlink(shm_name);
+            close(fd);
+            exit(EXIT_FAILURE);
+        }
+
+        mmap_flags = MAP_SHARED;
+    } else { // IPC_MMAP_PRIVATE
+        fd = open("/dev/zero", O_RDWR);
+        if (fd == -1) {
+            perror("open");
+            exit(EXIT_FAILURE);
+        }
+        mmap_flags = MAP_PRIVATE;
     }
 
-    if (ftruncate(fd, size) == -1) {
-        log_error("Не вдалося встановити розмір спільної пам'яті");
+    addr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, mmap_flags, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        if (params->mmap_mode == IPC_MMAP_SHARED) {
+            shm_unlink(shm_name);
+        }
         close(fd);
-        shm_unlink("ipc_mmap");
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
-    map = mmap(NULL, size, PROT_READ | PROT_WRITE, mode, fd, 0);
-    if (map == MAP_FAILED) {
-        log_error("Не вдалося відобразити спільну пам'ять");
-        close(fd);
-        shm_unlink("ipc_mmap");
-        return -1;
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    // Імітація запису повідомлень
+    for (size_t i = 0; i < params->message_count; ++i) {
+        memset((char*)addr + i * params->message_size, 'A', params->message_size);
     }
 
-    map_size = size;
-    return 0;
-}
-
-int ipc_mmap_send(const void *message, size_t size) {
-    if (size > map_size) {
-        log_error("Розмір повідомлення перевищує розмір відображення");
-        return -1;
+    // Імітація читання повідомлень
+    for (size_t i = 0; i < params->message_count; ++i) {
+        char buffer[params->message_size];
+        memcpy(buffer, (char*)addr + i * params->message_size, params->message_size);
+        // Обробка повідомлення при необхідності
     }
-    memcpy(map, message, size);
-    return 0;
-}
 
-int ipc_mmap_receive(void *buffer, size_t size) {
-    if (size > map_size) {
-        log_error("Розмір буфера перевищує розмір відображення");
-        return -1;
-    }
-    memcpy(buffer, map, size);
-    return 0;
-}
+    clock_gettime(CLOCK_MONOTONIC, &end);
 
-size_t ipc_mmap_get_capacity() {
-    return map_size;
-}
+    double elapsed_sec = end.tv_sec - start.tv_sec;
+    double elapsed_nsec = end.tv_nsec - start.tv_nsec;
+    double elapsed = elapsed_sec + elapsed_nsec / 1e9;
 
-void ipc_mmap_cleanup() {
-    if (map != NULL) {
-        munmap(map, map_size);
-        map = NULL;
+    printf("Elapsed time: %f seconds\n", elapsed);
+
+    // Розрахунок пропускної здатності
+    double throughput = (double)(params->message_size * params->message_count) / elapsed;
+    printf("Throughput: %f bytes/second\n", throughput);
+
+    munmap(addr, total_size);
+    if (params->mmap_mode == IPC_MMAP_SHARED) {
+        shm_unlink(shm_name);
     }
-    if (fd != -1) {
-        close(fd);
-        shm_unlink("ipc_mmap");
-        fd = -1;
-    }
+    close(fd);
 }

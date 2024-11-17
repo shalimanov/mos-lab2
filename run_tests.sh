@@ -1,24 +1,27 @@
 #!/bin/bash
 
-mkdir -p results
+make clean && make
 
-MESSAGE_SIZES=(128 256 512 1024)
-MESSAGE_COUNTS=(100 1000 10000)
-MMAP_MODE="MAP_SHARED"
-IPC_METHODS=("mmap" "shm" "posix_msgqueue")
+IPC_METHODS=("mmap")
+MESSAGE_SIZES=(64 1024)
+MESSAGE_COUNTS=(100 1000)
+MMAP_MODES=("shared" "private")
 
-RESULT_FILE="results/summary.csv"
-echo "Method,MessageSize,MessageCount,Mode,Latency (sec),Throughput (bytes/sec),Capacity" > $RESULT_FILE
+echo "---"
+echo "Start testing."
 
-for METHOD in "${IPC_METHODS[@]}"; do
-    for SIZE in "${MESSAGE_SIZES[@]}"; do
-        for COUNT in "${MESSAGE_COUNTS[@]}"; do
-            echo "Тестування з методом ${METHOD}, розміром повідомлення ${SIZE}, кількістю повідомлень ${COUNT}"
-            if [ "$METHOD" == "mmap" ]; then
-                ./ipc_test $METHOD $SIZE $COUNT $MMAP_MODE >> $RESULT_FILE
-            else
-                ./ipc_test $METHOD $SIZE $COUNT dummy >> $RESULT_FILE
-            fi
-        done
+for IPC_METHOD in "${IPC_METHODS[@]}"; do
+  for MESSAGE_SIZE in "${MESSAGE_SIZES[@]}"; do
+    for MESSAGE_COUNT in "${MESSAGE_COUNTS[@]}"; do
+      for MMAP_MODE in "${MMAP_MODES[@]}"; do
+        echo "Testing IPC_METHOD=$IPC_METHOD, MESSAGE_SIZE=$MESSAGE_SIZE, MESSAGE_COUNT=$MESSAGE_COUNT, MMAP_MODE=$MMAP_MODE"
+        ./ipc_compare $IPC_METHOD $MESSAGE_SIZE $MESSAGE_COUNT $MMAP_MODE
+        echo "Test finished."
+        echo "---"
+      done
     done
+  done
 done
+
+echo "Testing has been finished."
+echo "---"
