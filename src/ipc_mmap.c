@@ -53,16 +53,13 @@ void ipc_mmap(const ipc_params_t* params) {
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    // Імітація запису повідомлень
     for (size_t i = 0; i < params->message_count; ++i) {
         memset((char*)addr + i * params->message_size, 'A', params->message_size);
     }
 
-    // Імітація читання повідомлень
     for (size_t i = 0; i < params->message_count; ++i) {
         char buffer[params->message_size];
         memcpy(buffer, (char*)addr + i * params->message_size, params->message_size);
-        // Обробка повідомлення при необхідності
     }
 
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -73,7 +70,6 @@ void ipc_mmap(const ipc_params_t* params) {
 
     printf("Elapsed time: %f seconds\n", elapsed);
 
-    // Розрахунок пропускної здатності
     double throughput = (double)(params->message_size * params->message_count) / elapsed;
     printf("Throughput: %f bytes/second\n", throughput);
 

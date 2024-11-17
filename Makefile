@@ -1,7 +1,7 @@
 # Makefile
 CC = gcc
 CFLAGS = -Iinclude -Wall -Wextra -O2
-LDFLAGS =
+LDFLAGS = -lpthread
 
 SRCDIR = src
 OBJDIR = build
