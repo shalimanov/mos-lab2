@@ -17,7 +17,7 @@ void ipc_message_queue(const ipc_params_t* params) {
 
     struct mq_attr attr;
     attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;
+    attr.mq_maxmsg = 20;
     attr.mq_msgsize = params->message_size;
     attr.mq_curmsgs = 0;
 

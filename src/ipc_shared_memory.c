@@ -1,4 +1,3 @@
-// src/ipc_shared_memory.c
 #include "ipc.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,26 +5,19 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <string.h>
-#include <semaphore.h>
-#include <sys/stat.h>
 #include <time.h>
-#include <errno.h>
 #include <sys/wait.h>
 
 void ipc_shared_memory(const ipc_params_t* params) {
     const char* shm_name = "/ipc_shm";
-    const char* sem_full_name = "/ipc_sem_full";
-    const char* sem_empty_name = "/ipc_sem_empty";
-    size_t total_size = params->message_size * params->message_count;
+    size_t total_size = params->message_size * params->message_count + 2 * sizeof(int);
 
-    // Створення або відкриття об'єкта спільної пам'яті
     int fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
     if (fd == -1) {
         perror("shm_open");
         exit(EXIT_FAILURE);
     }
 
-    // Встановлення розміру спільної пам'яті
     if (ftruncate(fd, total_size) == -1) {
         perror("ftruncate");
         shm_unlink(shm_name);
@@ -33,7 +25,6 @@ void ipc_shared_memory(const ipc_params_t* params) {
         exit(EXIT_FAILURE);
     }
 
-    // Відображення спільної пам'яті в адресний простір
     void* addr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (addr == MAP_FAILED) {
         perror("mmap");
@@ -42,32 +33,23 @@ void ipc_shared_memory(const ipc_params_t* params) {
         exit(EXIT_FAILURE);
     }
 
-    // Створення семафорів для синхронізації
-    sem_t* sem_full = sem_open(sem_full_name, O_CREAT | O_EXCL, 0666, 0);
-    sem_t* sem_empty = sem_open(sem_empty_name, O_CREAT | O_EXCL, 0666, params->message_count);
+    int* write_flag = (int*)addr;
+    int* read_flag = (int*)addr + 1;
+    void* data_addr = (char*)addr + 2 * sizeof(int);
 
-    if (sem_full == SEM_FAILED || sem_empty == SEM_FAILED) {
-        perror("sem_open");
-        munmap(addr, total_size);
-        shm_unlink(shm_name);
-        sem_unlink(sem_full_name);
-        sem_unlink(sem_empty_name);
-        close(fd);
-        exit(EXIT_FAILURE);
-    }
+    *write_flag = 0;
+    *read_flag = 1;
 
     pid_t pid = fork();
     if (pid == -1) {
         perror("fork");
         munmap(addr, total_size);
         shm_unlink(shm_name);
-        sem_unlink(sem_full_name);
-        sem_unlink(sem_empty_name);
         close(fd);
         exit(EXIT_FAILURE);
     }
 
-    if (pid == 0) { // Дочірній процес (читач)
+    if (pid == 0) { // Reader
         char* buffer = malloc(params->message_size);
         if (!buffer) {
             perror("malloc");
@@ -75,33 +57,29 @@ void ipc_shared_memory(const ipc_params_t* params) {
         }
 
         for (size_t i = 0; i < params->message_count; ++i) {
-            sem_wait(sem_full); // Очікуємо, поки з'явиться повідомлення
+            // Wait for the writer to signal data is ready
+            while (*write_flag == 0) {
+                usleep(1); // Prevent CPU spinning
+            }
 
-            memcpy(buffer, (char*)addr + i * params->message_size, params->message_size);
+            memcpy(buffer, (char*)data_addr + i * params->message_size, params->message_size);
 
-            sem_post(sem_empty); // Повідомляємо, що місце звільнилося
-
-            // Обробка повідомлення при необхідності
+            // Signal to the writer that data has been consumed
+            *write_flag = 0;
+            __sync_synchronize();
+            *read_flag = 1;
         }
 
         free(buffer);
-
         munmap(addr, total_size);
         close(fd);
-
-        // Закриття семафорів
-        sem_close(sem_full);
-        sem_close(sem_empty);
-
         exit(EXIT_SUCCESS);
-    } else { // Батьківський процес (писач)
+    } else { // Writer
         char* message = malloc(params->message_size);
         if (!message) {
             perror("malloc");
             munmap(addr, total_size);
             shm_unlink(shm_name);
-            sem_unlink(sem_full_name);
-            sem_unlink(sem_empty_name);
             close(fd);
             exit(EXIT_FAILURE);
         }
@@ -111,11 +89,17 @@ void ipc_shared_memory(const ipc_params_t* params) {
         clock_gettime(CLOCK_MONOTONIC, &start);
 
         for (size_t i = 0; i < params->message_count; ++i) {
-            sem_wait(sem_empty); // Очікуємо, поки звільниться місце
+            // Wait for the reader to signal it is ready
+            while (*read_flag == 0) {
+                usleep(1); // Prevent CPU spinning
+            }
 
-            memcpy((char*)addr + i * params->message_size, message, params->message_size);
+            memcpy((char*)data_addr + i * params->message_size, message, params->message_size);
 
-            sem_post(sem_full); // Повідомляємо, що повідомлення доступне
+            // Signal to the reader that data is ready
+            *read_flag = 0;
+            __sync_synchronize();
+            *write_flag = 1;
         }
 
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -124,25 +108,19 @@ void ipc_shared_memory(const ipc_params_t* params) {
         double elapsed_nsec = end.tv_nsec - start.tv_nsec;
         double elapsed = elapsed_sec + elapsed_nsec / 1e9;
 
-        printf("Elapsed time: %f seconds\n", elapsed);
-
-        // Розрахунок пропускної здатності
         double throughput = (double)(params->message_size * params->message_count) / elapsed;
+
+        printf("Elapsed time: %f seconds\n", elapsed);
         printf("Throughput: %f bytes/second\n", throughput);
+        printf("Test finished.\n");
+        printf("---\n");
 
         free(message);
 
-        // Очікуємо завершення дочірнього процесу
         wait(NULL);
 
         munmap(addr, total_size);
         shm_unlink(shm_name);
         close(fd);
-
-        // Закриття та видалення семафорів
-        sem_close(sem_full);
-        sem_close(sem_empty);
-        sem_unlink(sem_full_name);
-        sem_unlink(sem_empty_name);
     }
 }

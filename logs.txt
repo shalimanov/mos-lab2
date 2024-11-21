@@ -40,24 +40,24 @@ Throughput: 738550306.527227 bytes/second
 Test finished.
 ---
 Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=64, MESSAGE_COUNT=100
-Elapsed time: 0.000047 seconds
-Throughput: 136752136.752137 bytes/second
+Elapsed time: 0.000023 seconds
+Throughput: 274678111.587983 bytes/second
 Test finished.
 ---
 Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=64, MESSAGE_COUNT=1000
-Elapsed time: 0.000177 seconds
-Throughput: 360766629.086809 bytes/second
+Elapsed time: 0.000224 seconds
+Throughput: 286097451.944569 bytes/second
 Test finished.
 ---
 Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=1024, MESSAGE_COUNT=100
-Elapsed time: 0.000477 seconds
-Throughput: 214630506.456731 bytes/second
+Elapsed time: 0.000208 seconds
+Throughput: 491362763.915547 bytes/second
 Test finished.
 ---
 Testing IPC_METHOD=shared_memory, MESSAGE_SIZE=1024, MESSAGE_COUNT=1000
-Elapsed time: 0.004588 seconds
-Throughput: 223176437.101513 bytes/second
-Test finished.
+Elapsed time: 0.003003 seconds
+Throughput: 340992227.441816 bytes/second
+Test finished
 ---
 Testing IPC_METHOD=pipe, MESSAGE_SIZE=64, MESSAGE_COUNT=100
 Elapsed time: 0.000362 seconds
